@@ -12,14 +12,22 @@ import SendMessageButton from "./components/MessageForm/SendMessageButton";
 import MessageActions from "./components/MessageForm/MessageActions";
 import Container from "./layout/components/Container";
 import WelcomeMessage from "./components/WelcomeMessage";
+import { useMessages } from "./contexts/messagesContext";
+import Layout from "./layout/Layout";
+import Message from "./components/Message";
 
 function App() {
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [validationMessage, setValidationMessage] = useState("");
   const [history, setHistory] = useLocalStorage("history", {});
 
-  const onMessageSubmit = useCallback(handleMessageSubmit, [message, messages]);
+  const { messages, updateMessages, deleteMessages } = useMessages();
+
+  const onMessageSubmit = useCallback(handleMessageSubmit, [
+    message,
+    updateMessages,
+  ]);
   function handleMessageSubmit(event) {
     event.preventDefault();
     if (!message) {
@@ -27,27 +35,35 @@ function App() {
       return;
     }
     setValidationMessage("");
-    setMessages([...messages, message]);
+    updateMessages([message]);
     setMessage("");
   }
 
-  const onEndChat = useCallback(handleEndChat, [history, messages, setHistory]);
+  const onEndChat = useCallback(handleEndChat, [
+    history,
+    messages,
+    setHistory,
+    deleteMessages,
+  ]);
   function handleEndChat() {
     let object = { ...history };
     object[messages[0]] = messages;
     setHistory(object);
 
-    setMessages([]);
+    deleteMessages();
   }
 
   return (
     <>
-      <Container>
-        <SideBar setMessages={setMessages}></SideBar>
+      <Layout>
         {messages.length === 0 ? (
           <WelcomeMessage />
         ) : (
-          <MessageBox messages={messages} setMessage={setMessage} />
+          <MessageBox>
+            {messages.map((message, index) => (
+              <Message setMessage={setMessage} content={message} key={index} />
+            ))}
+          </MessageBox>
         )}
         <MessageForm onSubmit={onMessageSubmit} messages={messages}>
           <MessageTextArea message={message} setMessage={setMessage} />
@@ -58,7 +74,7 @@ function App() {
             <SendMessageButton disabled={!message} />
           </MessageActions>
         </MessageForm>
-      </Container>
+      </Layout>
     </>
   );
 }

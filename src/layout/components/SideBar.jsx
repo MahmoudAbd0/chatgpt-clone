@@ -1,7 +1,9 @@
 import React from "react";
 import { useLocalStorage } from "usehooks-ts";
+import { useMessages } from "../../contexts/messagesContext";
 
-export default function SideBar({ setMessages }) {
+export default function SideBar() {
+  const { updateMessages } = useMessages();
   const [history, setHistory] = useLocalStorage("history", {});
 
   return (
@@ -16,7 +18,7 @@ export default function SideBar({ setMessages }) {
           {Object.keys(history).map((item, index) => (
             <li key={index}>
               <a
-                onClick={() => setMessages(history[item])}
+                onClick={() => updateMessages(history[item])}
                 className="flex items-center p-2  rounded-lg text-white bg-neutral-600 group hover:cursor-pointer"
               >
                 <span className="ms-3">{item}</span>
