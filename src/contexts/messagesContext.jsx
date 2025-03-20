@@ -15,7 +15,7 @@ export function MessagesProvider({ children }) {
 
   return (
     <MessagesContext.Provider
-      value={{ messages, updateMessages, deleteMessages }}
+      value={{ messages, updateMessages, deleteMessages, setMessages }}
     >
       {children}
     </MessagesContext.Provider>
